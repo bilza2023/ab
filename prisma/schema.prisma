@@ -1,0 +1,51 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model StockLedger {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+
+  mmaCode    String
+  supplierId Int
+  shade      String
+  size       String
+  qtyDelta   Float
+  reason     String
+  linkId     String?
+  ts         BigInt
+  meta       String?   // JSON string
+
+  @@index([mmaCode])
+  @@index([supplierId])
+  @@index([mmaCode, supplierId, shade, size])
+}
+
+model StockTransport {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+
+  transportId  String
+  type         String   // DISPATCH | RECEIVE | CANCEL
+
+  fromMmaCode  String?
+  toMmaCode    String?
+  supplierId   Int?
+  shade        String?
+  size         String?
+  qty          Float?
+
+  ts           BigInt
+  meta         String?   // JSON string
+
+  @@index([transportId])
+  @@index([fromMmaCode])
+  @@index([toMmaCode])
+}

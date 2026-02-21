@@ -8,12 +8,16 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "vitest"
+    "test": "vitest --run"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0"
   }
 }
