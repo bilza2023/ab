@@ -1,0 +1,27 @@
+<h1>Deposit into <%= mmaCode %></h1>
+
+<form method="POST">
+  <div>
+    <label>Supplier ID</label>
+    <input name="supplierId" required />
+  </div>
+
+  <div>
+    <label>Shade</label>
+    <input name="shade" required />
+  </div>
+
+  <div>
+    <label>Size</label>
+    <input name="size" value="mixed" />
+  </div>
+
+  <div>
+    <label>Quantity</label>
+    <input name="qty" type="number" required />
+  </div>
+
+  <button type="submit">Deposit</button>
+</form>
+
+<p><a href="/report">Back to Report</a></p>

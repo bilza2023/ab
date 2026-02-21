@@ -1,0 +1,25 @@
+<h1>Global Stock Report</h1>
+
+<% stations.forEach(station => { %>
+  <h2><%= station.code %></h2>
+
+  <table border="1" cellpadding="5">
+    <tr>
+      <th>Supplier</th>
+      <th>Shade</th>
+      <th>Size</th>
+      <th>Qty</th>
+    </tr>
+
+    <% station.balances.forEach(row => { %>
+      <tr>
+        <td><%= row.supplierId %></td>
+        <td><%= row.shade %></td>
+        <td><%= row.size %></td>
+        <td><%= row.qty %></td>
+      </tr>
+    <% }) %>
+  </table>
+<% }) %>
+
+<p><a href="/">Home</a></p>

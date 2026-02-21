@@ -8,7 +8,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "vitest --run"
+    "test": "vitest --run",
+     "dev": "node src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +19,8 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
     "prisma": "^5.22.0"
   }
 }

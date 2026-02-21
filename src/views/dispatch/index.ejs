@@ -1,0 +1,37 @@
+<h1>Dispatch from <%= mmaCode %></h1>
+
+<form method="POST">
+  <div>
+    <label>To MMA</label>
+    <input name="toMmaCode" required />
+  </div>
+
+  <div>
+    <label>Transport ID</label>
+    <input name="transportId" required />
+  </div>
+
+  <div>
+    <label>Supplier ID</label>
+    <input name="supplierId" required />
+  </div>
+
+  <div>
+    <label>Shade</label>
+    <input name="shade" required />
+  </div>
+
+  <div>
+    <label>Size</label>
+    <input name="size" value="mixed" />
+  </div>
+
+  <div>
+    <label>Quantity</label>
+    <input name="qty" type="number" required />
+  </div>
+
+  <button type="submit">Dispatch</button>
+</form>
+
+<p><a href="/report">Back to Report</a></p>

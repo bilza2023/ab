@@ -1,73 +1,100 @@
-// src/company/company.js
+import { MMA } from '../mma/MMA.js';
+import { eventStore } from '../infrastructure/eventStore.js';
 
-export class CompanyStructure {
-    constructor() {
-      this._stations = new Map();   // key: stationCode
-      this._mmas = new Map();       // key: mmaCode
-    }
-  
-    // -------------------------
-    // Stations
-    // -------------------------
-  
-    addStation(code, name) {
-      if (!code) throw new Error('station code is required');
-      if (this._stations.has(code)) {
-        throw new Error(`Station already exists: ${code}`);
+// -----------------------------
+// Config: All MMA Codes
+// -----------------------------
+
+const MMA_CODES = [
+  'ABS_RAW',
+  'PSS_SCREENED',
+  'KEF_FINAL'
+];
+
+// -----------------------------
+// Factory
+// -----------------------------
+
+function createMma(code) {
+  return new MMA({
+    code,
+    stationCode: code.split('_')[0],
+    getState: () => eventStore.getState(),
+    persistEvents: (events) => eventStore.persist(events)
+  });
+}
+
+// -----------------------------
+// Public API
+// -----------------------------
+
+export const company = {
+
+  getAllMmaCodes() {
+    return MMA_CODES;
+  },
+
+  async deposit(mmaCode, data) {
+    const mma = createMma(mmaCode);
+
+    await mma.deposit({
+      supplierId: Number(data.supplierId),
+      shade: data.shade,
+      size: data.size,
+      qty: Number(data.qty)
+    });
+  },
+
+  async dispatch(mmaCode, data) {
+    const mma = createMma(mmaCode);
+
+    await mma.dispatch({
+      toMmaCode: data.toMmaCode,
+      transportId: data.transportId,
+      supplierId: Number(data.supplierId),
+      shade: data.shade,
+      size: data.size,
+      qty: Number(data.qty)
+    });
+  },
+
+  async getStationReport(mmaCode) {
+    const mma = createMma(mmaCode);
+
+    const state = await eventStore.getState();
+
+    const rows = state.ledger.filter(l => l.mmaCode === mmaCode);
+
+    // Aggregate balances
+    const map = {};
+
+    for (const row of rows) {
+      const key = `${row.supplierId}|${row.shade}|${row.size}`;
+
+      if (!map[key]) {
+        map[key] = {
+          supplierId: row.supplierId,
+          shade: row.shade,
+          size: row.size,
+          qty: 0
+        };
       }
-  
-      const station = { code, name: name || code };
-      this._stations.set(code, station);
-  
-      return station;
+
+      map[key].qty += row.qtyDelta;
     }
-  
-    getStation(code) {
-      const station = this._stations.get(code);
-      if (!station) throw new Error(`Unknown station: ${code}`);
-      return station;
+
+    return Object.values(map).filter(r => r.qty !== 0);
+  },
+
+  async getGlobalReport() {
+    const stations = [];
+
+    for (const code of MMA_CODES) {
+      const balances = await this.getStationReport(code);
+      stations.push({ code, balances });
     }
-  
-    // -------------------------
-    // MMAs
-    // -------------------------
-  
-    addMMA(code, stationCode) {
-      if (!code) throw new Error('mma code is required');
-      if (!stationCode) throw new Error('stationCode is required');
-  
-      if (!this._stations.has(stationCode)) {
-        throw new Error(`Cannot add MMA. Station does not exist: ${stationCode}`);
-      }
-  
-      if (this._mmas.has(code)) {
-        throw new Error(`MMA already exists: ${code}`);
-      }
-  
-      const mma = {
-        code,
-        stationCode
-      };
-  
-      this._mmas.set(code, mma);
-  
-      return mma;
-    }
-  
-    getMMA(code) {
-      const mma = this._mmas.get(code);
-      if (!mma) throw new Error(`Unknown MMA: ${code}`);
-      return mma;
-    }
-  
-    // Optional helper (useful for UI later)
-    getMMAsByStation(stationCode) {
-      if (!this._stations.has(stationCode)) {
-        throw new Error(`Unknown station: ${stationCode}`);
-      }
-  
-      return [...this._mmas.values()].filter(
-        mma => mma.stationCode === stationCode
-      );
-    }
+
+    return stations;
   }
+
+};
