@@ -1,37 +1,125 @@
-<h1>Dispatch from <%= mmaCode %></h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dispatch</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
 
-<form method="POST">
-  <div>
-    <label>To MMA</label>
-    <input name="toMmaCode" required />
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 440px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .context {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    form {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      border-radius: 4px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 10px;
+      background: #2563eb;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .back:hover {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>DISPATCH</h1>
+  <div class="context">
+    <strong><%= fromMmaCode %></strong>
+    →
+    <strong><%= toMmaCode %></strong>
   </div>
 
-  <div>
+  <form method="POST">
+    <!-- 🔥 Lock routing values -->
+    <input type="hidden" name="fromMmaCode" value="<%= fromMmaCode %>" />
+    <input type="hidden" name="toMmaCode" value="<%= toMmaCode %>" />
+
     <label>Transport ID</label>
     <input name="transportId" required />
-  </div>
 
-  <div>
     <label>Supplier ID</label>
-    <input name="supplierId" required />
-  </div>
+    <input name="supplierId" type="number" required />
 
-  <div>
     <label>Shade</label>
     <input name="shade" required />
-  </div>
 
-  <div>
     <label>Size</label>
-    <input name="size" value="mixed" />
-  </div>
+    <input name="size" value="ANY" />
 
-  <div>
     <label>Quantity</label>
-    <input name="qty" type="number" required />
-  </div>
+    <input name="qty" type="number" step="0.01" required />
 
-  <button type="submit">Dispatch</button>
-</form>
+    <button type="submit">Confirm Dispatch</button>
+  </form>
 
-<p><a href="/report">Back to Report</a></p>
+  <a class="back" href="/">← Back to Control Panel</a>
+</div>
+
+</body>
+</html>

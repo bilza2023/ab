@@ -1,9 +1,9 @@
 import { MMA } from '../mma/MMA.js';
 import { eventStore } from '../infrastructure/eventStore.js';
 
-// -----------------------------
-// Config: All MMA Codes
-// -----------------------------
+// ----------------------------------
+// Config
+// ----------------------------------
 
 const MMA_CODES = [
   'ABS_RAW',
@@ -11,11 +11,15 @@ const MMA_CODES = [
   'KEF_FINAL'
 ];
 
-// -----------------------------
+// ----------------------------------
 // Factory
-// -----------------------------
+// ----------------------------------
 
 function createMma(code) {
+  if (!MMA_CODES.includes(code)) {
+    throw new Error(`Invalid MMA code: ${code}`);
+  }
+
   return new MMA({
     code,
     stationCode: code.split('_')[0],
@@ -24,20 +28,24 @@ function createMma(code) {
   });
 }
 
-// -----------------------------
-// Public API
-// -----------------------------
+// ----------------------------------
+// Application Facade (Verbs Only)
+// ----------------------------------
 
 export const company = {
+
+  // ----- Meta -----
 
   getAllMmaCodes() {
     return MMA_CODES;
   },
 
+  // ----- Verbs -----
+
   async deposit(mmaCode, data) {
     const mma = createMma(mmaCode);
 
-    await mma.deposit({
+    return mma.deposit({
       supplierId: Number(data.supplierId),
       shade: data.shade,
       size: data.size,
@@ -45,10 +53,22 @@ export const company = {
     });
   },
 
+  async withdraw(mmaCode, data) {
+    const mma = createMma(mmaCode);
+
+    return mma.withdraw({
+      supplierId: Number(data.supplierId),
+      shade: data.shade,
+      size: data.size,
+      qty: Number(data.qty),
+      reason: 'WITHDRAW'
+    });
+  },
+
   async dispatch(mmaCode, data) {
     const mma = createMma(mmaCode);
 
-    await mma.dispatch({
+    return mma.dispatch({
       toMmaCode: data.toMmaCode,
       transportId: data.transportId,
       supplierId: Number(data.supplierId),
@@ -58,43 +78,24 @@ export const company = {
     });
   },
 
-  async getStationReport(mmaCode) {
+  async receive(mmaCode, data) {
     const mma = createMma(mmaCode);
 
-    const state = await eventStore.getState();
-
-    const rows = state.ledger.filter(l => l.mmaCode === mmaCode);
-
-    // Aggregate balances
-    const map = {};
-
-    for (const row of rows) {
-      const key = `${row.supplierId}|${row.shade}|${row.size}`;
-
-      if (!map[key]) {
-        map[key] = {
-          supplierId: row.supplierId,
-          shade: row.shade,
-          size: row.size,
-          qty: 0
-        };
-      }
-
-      map[key].qty += row.qtyDelta;
-    }
-
-    return Object.values(map).filter(r => r.qty !== 0);
+ console.log(data);
+    return mma.receive({
+      transportId: data.transportId,
+      supplierId:data.supplierId, 
+      qty:data.qty,
+      toMmaCode:data.toMmaCode
+    });
   },
 
-  async getGlobalReport() {
-    const stations = [];
+  async cancel(mmaCode, data) {
+    const mma = createMma(mmaCode);
 
-    for (const code of MMA_CODES) {
-      const balances = await this.getStationReport(code);
-      stations.push({ code, balances });
-    }
-
-    return stations;
+    return mma.cancel({
+      transportId: data.transportId
+    });
   }
 
 };

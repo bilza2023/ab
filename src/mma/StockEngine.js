@@ -172,27 +172,37 @@ export const StockEngine = (() => {
     return [transportEvent, ledgerEvent];
   };
 
-  const receive = (state, { transportId, ts }) => {
-
+  const receive = (state, { transportId, qty, ts }) => {
+   console.log("qty",qty);
     need(transportId, 'transportId');
+    need(qty, 'qty');
     need(ts, 'ts');
-
+  
+    qty = Number(qty);
+    if (qty <= 0) throw new Error('Invalid receive qty');
+  
+    // 1️⃣ Find DISPATCH
     const dispatch = state.transport.find(
       t => t.transportId === transportId && t.type === 'DISPATCH'
     );
-
+  
     if (!dispatch) throw new Error('DISPATCH not found');
-
+  
+    // 2️⃣ Prevent double receive
     const already = state.transport.find(
       t => t.transportId === transportId && t.type === 'RECEIVE'
     );
-    if (already) return [];
-
+  
+    if (already) throw new Error('Transport already received');
+  
+    // 3️⃣ Prevent receive if canceled
     const canceled = state.transport.find(
       t => t.transportId === transportId && t.type === 'CANCEL'
     );
+  
     if (canceled) throw new Error('Transport canceled');
-
+  
+    // 4️⃣ Create RECEIVE event using incoming qty (NOT dispatch.qty)
     const transportEvent = {
       type: 'RECEIVE',
       transportId,
@@ -201,25 +211,25 @@ export const StockEngine = (() => {
       supplierId: dispatch.supplierId,
       shade: dispatch.shade,
       size: dispatch.size,
-      qty: dispatch.qty,
+      qty,            // 🔥 actual weighed qty
       ts
     };
-
+  
+    // 5️⃣ Ledger reflects actual received weight
     const ledgerEvent = {
       type: 'LEDGER',
       mmaCode: dispatch.toMmaCode,
       supplierId: dispatch.supplierId,
       shade: dispatch.shade,
       size: dispatch.size,
-      qtyDelta: dispatch.qty,
+      qtyDelta: qty,  // 🔥 actual incoming weight
       reason: 'TRANSPORT',
       linkId: transportId,
       ts
     };
-
+  
     return [transportEvent, ledgerEvent];
   };
-
   const cancel = (state, { transportId, ts }) => {
 
     need(transportId, 'transportId');

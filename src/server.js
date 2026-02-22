@@ -1,9 +1,9 @@
-
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
 import { company } from './application/company.js';
+
+import { receive } from './application/receive.js';
 
 const app = express();
 
@@ -24,72 +24,117 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // -----------------------------
-// Home
+// Home (Wiring Matrix)
 // -----------------------------
 
 app.get('/', (req, res) => {
-  const mmaCodes = company.getAllMmaCodes();
-
-  res.render('home', { mmaCodes });
+  res.render('home');
 });
 
-// -----------------------------
-// Global Report
-// -----------------------------
+// ==================================================
+// DEPOSIT
+// ==================================================
 
-app.get('/report', async (req, res) => {
-  const stations = await company.getGlobalReport();
-  res.render('report/index', { stations });
+app.get('/deposit', (req, res) => {
+  const { to } = req.query;
+  if (!to) return res.status(400).send('Missing ?to=mmaCode');
+
+  res.render('deposit/index', { mmaCode: to });
 });
 
-// -----------------------------
-// Station Report
-// -----------------------------
+app.post('/deposit', async (req, res) => {
+  const { toMmaCode, supplierId, shade, size, qty } = req.body;
 
-app.get('/mma/:code', async (req, res) => {
-  const mmaCode = req.params.code;
-
-  const balances = await company.getStationReport(mmaCode);
-
-  res.render('report/index', {
-    stations: [{ code: mmaCode, balances }]
+  await company.deposit(toMmaCode, {
+    supplierId,
+    shade,
+    size,
+    qty
   });
+
+  res.redirect('/');
 });
 
-// -----------------------------
-// Deposit
-// -----------------------------
+// ==================================================
+// DISPATCH
+// ==================================================
 
-app.get('/mma/:code/deposit', (req, res) => {
-  res.render('deposit/index', {
-    mmaCode: req.params.code
-  });
-});
+app.get('/dispatch', (req, res) => {
+  const { from, to } = req.query;
+  if (!from || !to)
+    return res.status(400).send('Missing ?from= & ?to=');
 
-app.post('/mma/:code/deposit', async (req, res) => {
-  const mmaCode = req.params.code;
-
-  await company.deposit(mmaCode, req.body);
-
-  res.redirect(`/mma/${mmaCode}`);
-});
-
-// -----------------------------
-// Dispatch
-// -----------------------------
-
-app.get('/mma/:code/dispatch', (req, res) => {
   res.render('dispatch/index', {
-    mmaCode: req.params.code
+    fromMmaCode: from,
+    toMmaCode: to
   });
 });
 
-app.post('/mma/:code/dispatch', async (req, res) => {
-  const mmaCode = req.params.code;
+app.post('/dispatch', async (req, res) => {
+  const {
+    fromMmaCode,
+    toMmaCode,
+    transportId,   // ✅ include this
+    supplierId,
+    shade,
+    size,
+    qty
+  } = req.body;
 
-  await company.dispatch(mmaCode, req.body);
+  await company.dispatch(fromMmaCode, {
+    toMmaCode,
+    transportId,   // ✅ pass it forward
+    supplierId,
+    shade,
+    size,
+    qty
+  });
 
-  res.redirect(`/mma/${mmaCode}`);
+  res.redirect('/');
+});
+
+// ==================================================
+// WITHDRAW
+// ==================================================
+
+app.get('/withdraw', (req, res) => {
+  const { from } = req.query;
+  if (!from) return res.status(400).send('Missing ?from=mmaCode');
+
+  res.render('withdraw/index', { mmaCode: from });
+});
+
+app.post('/withdraw', async (req, res) => {
+  const { fromMmaCode, supplierId, shade, size, qty, processId } = req.body;
+
+  await company.withdraw(fromMmaCode, {
+    supplierId,
+    shade,
+    size,
+    qty,
+    processId
+  });
+
+  res.redirect('/');
+});
+
+// ==================================================
+// RECEIVE
+// ==================================================
+
+app.get('/receive', (req, res) => {
+  const { to } = req.query;
+  if (!to) return res.status(400).send('Missing ?to=mmaCode');
+
+  res.render('receive/index', { mmaCode: to });
+});
+
+app.post('/receive', async (req, res) => {
+  const { transportId, qty } = req.body;
+
+  await receive({ transportId, qty });
+
+  res.redirect('/');
 });
 
 // -----------------------------

@@ -148,14 +148,4 @@ async  cancel({ transportId }) {
   // Read
   // ---------------------------
 
-async  onHand({ supplierId, shade, size } = {}) {
-    const state = await this._getState();
-
-    return StockEngine.onHand(state.ledger, {
-      mmaCode: this.code,
-      supplierId,
-      shade,
-      size
-    });
-  }
 }
