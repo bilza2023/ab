@@ -1,13 +1,9 @@
 
-// ab-engine/src/StockEngine.js
+// src/StockEngine.js
 
 export const StockEngine = (() => {
 
   const sizeDefault = 'ANY';
-
-  // ---------------------------
-  // Helpers
-  // ---------------------------
 
   const need = (val, name) => {
     if (val == null || val === '') {
@@ -26,9 +22,9 @@ export const StockEngine = (() => {
   const bucketKey = ({ mmaCode, supplierId, shade, size }) =>
     `${mmaCode}|${supplierId}|${shade}|${normSize(size)}`;
 
-  // ---------------------------
-  // READS (pure)
-  // ---------------------------
+  // --------------------------------
+  // READ
+  // --------------------------------
 
   const onHand = (ledger, { mmaCode, supplierId, shade, size }) => {
     const key = bucketKey({ mmaCode, supplierId, shade, size });
@@ -38,9 +34,15 @@ export const StockEngine = (() => {
       .reduce((sum, e) => sum + e.qtyDelta, 0);
   };
 
-  // ---------------------------
-  // COMMANDS (pure)
-  // ---------------------------
+  const transportBalance = (transportEvents, transportId) => {
+    return transportEvents
+      .filter(t => t.transportId === transportId)
+      .reduce((sum, t) => sum + t.qtyDelta, 0);
+  };
+
+  // --------------------------------
+  // DEPOSIT
+  // --------------------------------
 
   const deposit = (state, {
     toMmaCode,
@@ -67,10 +69,15 @@ export const StockEngine = (() => {
       size: normSize(size),
       qtyDelta: Number(qty),
       reason,
+      transportId: null,
       meta,
       ts
     }];
   };
+
+  // --------------------------------
+  // WITHDRAW
+  // --------------------------------
 
   const withdraw = (state, {
     fromMmaCode,
@@ -97,7 +104,7 @@ export const StockEngine = (() => {
     });
 
     if (available < qty) {
-      throw new Error(`Insufficient stock (available=${available}, requested=${qty})`);
+      throw new Error(`Insufficient stock`);
     }
 
     return [{
@@ -108,14 +115,15 @@ export const StockEngine = (() => {
       size: normSize(size),
       qtyDelta: -Number(qty),
       reason,
+      transportId: null,
       meta,
       ts
     }];
   };
 
-  // ---------------------------
+  // --------------------------------
   // DISPATCH
-  // ---------------------------
+  // --------------------------------
 
   const dispatch = (state, {
     transportId,
@@ -132,18 +140,13 @@ export const StockEngine = (() => {
     need(transportId, 'transportId');
     need(fromMmaCode, 'fromMmaCode');
     need(toMmaCode, 'toMmaCode');
-    need(supplierId, 'supplierId');
-    need(shade, 'shade');
     needPos(qty);
     need(ts, 'ts');
 
-    // 🚫 Block duplicate DISPATCH
-    const existingDispatch = state.transport.find(
-      t => t.transportId === transportId && t.type === 'DISPATCH'
+    const existing = state.transport.find(
+      t => t.transportId === transportId
     );
-    if (existingDispatch) {
-      throw new Error('Duplicate transportId');
-    }
+    if (existing) throw new Error('Duplicate transportId');
 
     const available = onHand(state.ledger, {
       mmaCode: fromMmaCode,
@@ -153,41 +156,44 @@ export const StockEngine = (() => {
     });
 
     if (available < qty) {
-      throw new Error(`Insufficient stock (available=${available}, requested=${qty})`);
+      throw new Error('Insufficient stock');
     }
 
-    const transportEvent = {
-      type: 'DISPATCH',
-      transportId,
-      fromMmaCode,
-      toMmaCode,
-      supplierId,
-      shade,
-      size: normSize(size),
-      qty: Number(qty),
-      meta,
-      ts
-    };
+    return [
 
-    const ledgerEvent = {
-      type: 'LEDGER',
-      mmaCode: fromMmaCode,
-      supplierId,
-      shade,
-      size: normSize(size),
-      qtyDelta: -Number(qty),
-      reason: 'TRANSPORT',
-      linkId: transportId,
-      meta,
-      ts
-    };
+      // Transport event (+)
+      {
+        type: 'DISPATCH',
+        transportId,
+        fromMmaCode,
+        toMmaCode,
+        supplierId,
+        shade,
+        size: normSize(size),
+        qtyDelta: Number(qty),
+        meta,
+        ts
+      },
 
-    return [transportEvent, ledgerEvent];
+      // Ledger event (-)
+      {
+        type: 'LEDGER',
+        mmaCode: fromMmaCode,
+        supplierId,
+        shade,
+        size: normSize(size),
+        qtyDelta: -Number(qty),
+        reason: 'TRANSPORT',
+        transportId,
+        meta,
+        ts
+      }
+    ];
   };
 
-  // ---------------------------
-  // RECEIVE
-  // ---------------------------
+  // --------------------------------
+  // RECEIVE (partial supported)
+  // --------------------------------
 
   const receive = (state, { transportId, qty, ts }) => {
 
@@ -195,104 +201,90 @@ export const StockEngine = (() => {
     needPos(qty);
     need(ts, 'ts');
 
-    qty = Number(qty);
-
-    const dispatch = state.transport.find(
+    const dispatchEvent = state.transport.find(
       t => t.transportId === transportId && t.type === 'DISPATCH'
     );
-    if (!dispatch) throw new Error('DISPATCH not found');
 
-    const already = state.transport.find(
-      t => t.transportId === transportId && t.type === 'RECEIVE'
-    );
-    if (already) throw new Error('Already received');
+    if (!dispatchEvent) throw new Error('DISPATCH not found');
 
-    const canceled = state.transport.find(
-      t => t.transportId === transportId && t.type === 'CANCEL'
-    );
-    if (canceled) throw new Error('Transport canceled');
+    const balance = transportBalance(state.transport, transportId);
 
-    // 🚫 Cannot receive more than dispatched
-    if (qty > dispatch.qty) {
-      throw new Error('Receive qty exceeds dispatched qty');
+    if (qty > balance) {
+      throw new Error('Receive exceeds pending qty');
     }
 
-    const transportEvent = {
-      type: 'RECEIVE',
-      transportId,
-      fromMmaCode: dispatch.fromMmaCode,
-      toMmaCode: dispatch.toMmaCode,
-      supplierId: dispatch.supplierId,
-      shade: dispatch.shade,
-      size: dispatch.size,
-      qty,
-      ts
-    };
+    return [
 
-    const ledgerEvent = {
-      type: 'LEDGER',
-      mmaCode: dispatch.toMmaCode,
-      supplierId: dispatch.supplierId,
-      shade: dispatch.shade,
-      size: dispatch.size,
-      qtyDelta: qty,
-      reason: 'TRANSPORT',
-      linkId: transportId,
-      ts
-    };
+      // Transport event (-)
+      {
+        type: 'RECEIVE',
+        transportId,
+        fromMmaCode: dispatchEvent.fromMmaCode,
+        toMmaCode: dispatchEvent.toMmaCode,
+        supplierId: dispatchEvent.supplierId,
+        shade: dispatchEvent.shade,
+        size: dispatchEvent.size,
+        qtyDelta: -Number(qty),
+        ts
+      },
 
-    return [transportEvent, ledgerEvent];
+      // Ledger event (+)
+      {
+        type: 'LEDGER',
+        mmaCode: dispatchEvent.toMmaCode,
+        supplierId: dispatchEvent.supplierId,
+        shade: dispatchEvent.shade,
+        size: dispatchEvent.size,
+        qtyDelta: Number(qty),
+        reason: 'TRANSPORT',
+        transportId,
+        ts
+      }
+    ];
   };
 
-  // ---------------------------
-  // CANCEL
-  // ---------------------------
+  // --------------------------------
+  // CANCEL (reverses remaining)
+  // --------------------------------
 
   const cancel = (state, { transportId, ts }) => {
 
     need(transportId, 'transportId');
     need(ts, 'ts');
 
-    const dispatch = state.transport.find(
+    const balance = transportBalance(state.transport, transportId);
+    if (balance <= 0) return [];
+
+    const dispatchEvent = state.transport.find(
       t => t.transportId === transportId && t.type === 'DISPATCH'
     );
-    if (!dispatch) throw new Error('DISPATCH not found');
 
-    const received = state.transport.find(
-      t => t.transportId === transportId && t.type === 'RECEIVE'
-    );
-    if (received) throw new Error('Already received');
+    return [
 
-    const already = state.transport.find(
-      t => t.transportId === transportId && t.type === 'CANCEL'
-    );
-    if (already) return [];
+      {
+        type: 'CANCEL',
+        transportId,
+        fromMmaCode: dispatchEvent.fromMmaCode,
+        toMmaCode: dispatchEvent.toMmaCode,
+        supplierId: dispatchEvent.supplierId,
+        shade: dispatchEvent.shade,
+        size: dispatchEvent.size,
+        qtyDelta: -balance,
+        ts
+      },
 
-    const cancelEvent = {
-      type: 'CANCEL',
-      transportId,
-      fromMmaCode: dispatch.fromMmaCode,
-      toMmaCode: dispatch.toMmaCode,
-      supplierId: dispatch.supplierId,
-      shade: dispatch.shade,
-      size: dispatch.size,
-      qty: dispatch.qty,
-      ts
-    };
-
-    const ledgerEvent = {
-      type: 'LEDGER',
-      mmaCode: dispatch.fromMmaCode,
-      supplierId: dispatch.supplierId,
-      shade: dispatch.shade,
-      size: dispatch.size,
-      qtyDelta: dispatch.qty,
-      reason: 'REVERSAL',
-      linkId: transportId,
-      ts
-    };
-
-    return [cancelEvent, ledgerEvent];
+      {
+        type: 'LEDGER',
+        mmaCode: dispatchEvent.fromMmaCode,
+        supplierId: dispatchEvent.supplierId,
+        shade: dispatchEvent.shade,
+        size: dispatchEvent.size,
+        qtyDelta: balance,
+        reason: 'CANCEL',
+        transportId,
+        ts
+      }
+    ];
   };
 
   return {

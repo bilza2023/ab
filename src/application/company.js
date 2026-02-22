@@ -1,3 +1,4 @@
+
 // src/application/company.js
 
 import { StockEngine } from './StockEngine.js';
@@ -98,7 +99,7 @@ export const company = {
     return events;
   },
 
-  // ----- Receive (transport-rooted) -----
+  // ----- Receive -----
 
   async receive(data) {
     const state = await eventStore.getState();

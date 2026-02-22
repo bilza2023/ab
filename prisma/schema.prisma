@@ -1,5 +1,3 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,15 +15,18 @@ model StockLedger {
   supplierId Int
   shade      String
   size       String
+
   qtyDelta   Float
-  reason     String
-  linkId     String?
-  ts         BigInt
-  meta       String?   // JSON string
+  reason     String   // enforce in code
+
+  transportId String?
+  ts          BigInt
+  meta        String?
 
   @@index([mmaCode])
   @@index([supplierId])
   @@index([mmaCode, supplierId, shade, size])
+  @@index([transportId])
 }
 
 model StockTransport {
@@ -33,19 +34,21 @@ model StockTransport {
   createdAt    DateTime @default(now())
 
   transportId  String
-  type         String   // DISPATCH | RECEIVE | CANCEL
+  type         String   // enforce in code
 
   fromMmaCode  String?
   toMmaCode    String?
-  supplierId   Int?
-  shade        String?
-  size         String?
-  qty          Float?
 
+  supplierId   Int
+  shade        String
+  size         String
+
+  qtyDelta     Float
   ts           BigInt
-  meta         String?   // JSON string
+  meta         String?
 
   @@index([transportId])
+  @@index([type])
   @@index([fromMmaCode])
   @@index([toMmaCode])
 }

@@ -1,3 +1,4 @@
+
 // src/core/eventStore.js
 
 import { PrismaClient } from '@prisma/client';
@@ -9,7 +10,9 @@ export const eventStore = {
   async getState() {
     const ledgerRows = await prisma.stockLedger.findMany();
     const transportRows = await prisma.stockTransport.findMany();
+
     console.log('EVENTSTORE DB:', process.env.DATABASE_URL);
+
     return {
       ledger: ledgerRows.map(r => ({
         mmaCode: r.mmaCode,
@@ -18,10 +21,11 @@ export const eventStore = {
         size: r.size,
         qtyDelta: r.qtyDelta,
         reason: r.reason,
-        linkId: r.linkId,
+        transportId: r.transportId ?? null,
         ts: Number(r.ts),
         meta: r.meta ? JSON.parse(r.meta) : null
       })),
+
       transport: transportRows.map(r => ({
         transportId: r.transportId,
         type: r.type,
@@ -30,7 +34,7 @@ export const eventStore = {
         supplierId: r.supplierId,
         shade: r.shade,
         size: r.size,
-        qty: r.qty,
+        qtyDelta: r.qtyDelta,
         ts: Number(r.ts),
         meta: r.meta ? JSON.parse(r.meta) : null
       }))
@@ -52,7 +56,7 @@ export const eventStore = {
               size: e.size,
               qtyDelta: e.qtyDelta,
               reason: e.reason,
-              linkId: e.linkId ?? null,
+              transportId: e.transportId ?? null,
               ts: BigInt(e.ts),
               meta: e.meta ? JSON.stringify(e.meta) : null
             }
@@ -69,7 +73,7 @@ export const eventStore = {
               supplierId: e.supplierId ?? null,
               shade: e.shade ?? null,
               size: e.size ?? null,
-              qty: e.qty ?? null,
+              qtyDelta: e.qtyDelta,
               ts: BigInt(e.ts),
               meta: e.meta ? JSON.stringify(e.meta) : null
             }
