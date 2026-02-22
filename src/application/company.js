@@ -1,4 +1,6 @@
-import { MMA } from '../mma/MMA.js';
+// src/application/company.js
+
+import { StockEngine } from './StockEngine.js';
 import { eventStore } from '../infrastructure/eventStore.js';
 
 // ----------------------------------
@@ -11,25 +13,18 @@ const MMA_CODES = [
   'KEF_FINAL'
 ];
 
-// ----------------------------------
-// Factory
-// ----------------------------------
-
-function createMma(code) {
+function requireValidMma(code) {
   if (!MMA_CODES.includes(code)) {
     throw new Error(`Invalid MMA code: ${code}`);
   }
+}
 
-  return new MMA({
-    code,
-    stationCode: code.split('_')[0],
-    getState: () => eventStore.getState(),
-    persistEvents: (events) => eventStore.persist(events)
-  });
+function now() {
+  return Date.now();
 }
 
 // ----------------------------------
-// Application Facade (Verbs Only)
+// Application Facade
 // ----------------------------------
 
 export const company = {
@@ -40,62 +35,99 @@ export const company = {
     return MMA_CODES;
   },
 
-  // ----- Verbs -----
+  // ----- Deposit -----
 
   async deposit(mmaCode, data) {
-    const mma = createMma(mmaCode);
+    requireValidMma(mmaCode);
 
-    return mma.deposit({
-      supplierId: Number(data.supplierId),
-      shade: data.shade,
-      size: data.size,
-      qty: Number(data.qty)
-    });
-  },
+    const state = await eventStore.getState();
 
-  async withdraw(mmaCode, data) {
-    const mma = createMma(mmaCode);
-
-    return mma.withdraw({
+    const events = StockEngine.deposit(state, {
+      toMmaCode: mmaCode,
       supplierId: Number(data.supplierId),
       shade: data.shade,
       size: data.size,
       qty: Number(data.qty),
-      reason: 'WITHDRAW'
+      ts: now()
     });
+
+    await eventStore.persist(events);
+    return events;
   },
 
-  async dispatch(mmaCode, data) {
-    const mma = createMma(mmaCode);
+  // ----- Withdraw -----
 
-    return mma.dispatch({
-      toMmaCode: data.toMmaCode,
-      transportId: data.transportId,
+  async withdraw(mmaCode, data) {
+    requireValidMma(mmaCode);
+
+    const state = await eventStore.getState();
+
+    const events = StockEngine.withdraw(state, {
+      fromMmaCode: mmaCode,
       supplierId: Number(data.supplierId),
       shade: data.shade,
       size: data.size,
-      qty: Number(data.qty)
+      qty: Number(data.qty),
+      ts: now()
     });
+
+    await eventStore.persist(events);
+    return events;
   },
 
-  async receive(mmaCode, data) {
-    const mma = createMma(mmaCode);
+  // ----- Dispatch -----
 
- console.log(data);
-    return mma.receive({
+  async dispatch(mmaCode, data) {
+    requireValidMma(mmaCode);
+    requireValidMma(data.toMmaCode);
+
+    const state = await eventStore.getState();
+
+    const events = StockEngine.dispatch(state, {
       transportId: data.transportId,
-      supplierId:data.supplierId, 
-      qty:data.qty,
-      toMmaCode:data.toMmaCode
+      fromMmaCode: mmaCode,
+      toMmaCode: data.toMmaCode,
+      supplierId: Number(data.supplierId),
+      shade: data.shade,
+      size: data.size,
+      qty: Number(data.qty),
+      ts: now()
     });
+
+    await eventStore.persist(events);
+    return events;
   },
 
-  async cancel(mmaCode, data) {
-    const mma = createMma(mmaCode);
+  // ----- Receive (transport-rooted) -----
 
-    return mma.cancel({
-      transportId: data.transportId
+  async receive(data) {
+    const state = await eventStore.getState();
+
+    const events = StockEngine.receive(state, {
+      transportId: data.transportId,
+      qty: Number(data.qty),
+      ts: now()
     });
+
+    await eventStore.persist(events);
+    return events;
+  },
+
+  // ----- Cancel -----
+
+  async cancel(data) {
+    const state = await eventStore.getState();
+
+    const events = StockEngine.cancel(state, {
+      transportId: data.transportId,
+      ts: now()
+    });
+
+    if (events.length > 0) {
+      await eventStore.persist(events);
+    }
+
+    return events;
   }
 
 };

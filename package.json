@@ -7,10 +7,10 @@
   "directories": {
     "doc": "docs"
   },
- "scripts": {
-  "test": "vitest --run",
- "dev": "nodemon src/server.js"
-},
+  "scripts": {
+    "test": "vitest --run",
+    "dev": "nodemon src/server.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -22,6 +22,7 @@
     "@prisma/client": "^5.22.0",
     "ejs": "^4.0.1",
     "express": "^5.2.1",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "stock-engine": "^1.0.1"
   }
 }

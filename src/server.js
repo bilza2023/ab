@@ -3,8 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { company } from './application/company.js';
 
-import { receive } from './application/receive.js';
-
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -123,20 +121,23 @@ app.post('/withdraw', async (req, res) => {
 // ==================================================
 
 app.get('/receive', (req, res) => {
-  const { to } = req.query;
-  if (!to) return res.status(400).send('Missing ?to=mmaCode');
-
-  res.render('receive/index', { mmaCode: to });
+  res.render('receive/index');
 });
-
 app.post('/receive', async (req, res) => {
-  const { transportId, qty } = req.body;
+  try {
+    const { transportId, qty } = req.body;
 
-  await receive({ transportId, qty });
+    await company.receive({
+      transportId,
+      qty
+    });
 
-  res.redirect('/');
+    res.redirect('/');
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
 });
-
 // -----------------------------
 // Start Server
 // -----------------------------
