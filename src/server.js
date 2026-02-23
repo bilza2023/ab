@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { company } from './application/company.js';
-
+import * as reportRoutes from './routes/report.js';
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +29,21 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
+// ==================================================
+// REPORTS
+// ==================================================
+app.get('/report', (req, res) => {
+  res.render('report/index');
+});
+// ==================================================
+// REPORT ROUTES
+// ==================================================
+
+app.get('/report/onhand', reportRoutes.onHand);
+app.get('/report/intransit', reportRoutes.inTransit);
+app.get('/report/transport-audit', reportRoutes.transportAudit);
+app.get('/report/process-audit', reportRoutes.processAudit);
+app.get('/report/movement-ledger', reportRoutes.movementLedger);
 // ==================================================
 // DEPOSIT
 // ==================================================
