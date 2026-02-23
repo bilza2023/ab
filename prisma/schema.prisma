@@ -19,7 +19,7 @@ model StockLedger {
   qtyDelta   Float
   reason     String   // enforce in code
 
-  transportId String?
+  transportId String? // Null if Deposit?
   ts          BigInt
   meta        String?
 

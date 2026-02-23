@@ -104,6 +104,19 @@ router.get('/withdraw', async (req, res) => {
   });
 });
 
+router.post('/withdraw', async (req, res) => {
+  const { fromMmaCode, supplierId, shade, size, qty } = req.body;
+
+  await company.withdraw(fromMmaCode, {
+    supplierId,
+    shade,
+    size,
+    qty
+  });
+
+  res.redirect('/');
+});
+
 // ==================================================
 // RECEIVE
 // ==================================================
