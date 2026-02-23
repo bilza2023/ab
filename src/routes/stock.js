@@ -61,7 +61,6 @@ router.get('/dispatch', async (req, res) => {
     shades
   });
 });
-
 router.post('/dispatch', async (req, res) => {
   const {
     fromMmaCode,
@@ -69,21 +68,17 @@ router.post('/dispatch', async (req, res) => {
     supplierId,
     shade,
     size,
-    qty
+    qty,
+    transportNumber
   } = req.body;
 
   // System-generated shipment/grouping key
   const transportId = randomUUID();
-  // console.log({
-  //   fromMmaCode,
-  //   supplierId,
-  //   shade,
-  //   size,
-  //   qty
-  // });
+
   await company.dispatch(fromMmaCode, {
     toMmaCode,
     transportId,
+    transportNumber: transportNumber || null,  // 👈 optional
     supplierId,
     shade,
     size,

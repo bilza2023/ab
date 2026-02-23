@@ -81,11 +81,12 @@ export const company = {
   async dispatch(mmaCode, data) {
     requireValidMma(mmaCode);
     requireValidMma(data.toMmaCode);
-
+  
     const state = await eventStore.getState();
-
+  
     const events = StockEngine.dispatch(state, {
       transportId: data.transportId,
+      transportNumber: data.transportNumber || null,   // 👈 added
       fromMmaCode: mmaCode,
       toMmaCode: data.toMmaCode,
       supplierId: Number(data.supplierId),
@@ -94,7 +95,7 @@ export const company = {
       qty: Number(data.qty),
       ts: now()
     });
-
+  
     await eventStore.persist(events);
     return events;
   },

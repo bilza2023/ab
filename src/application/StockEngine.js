@@ -127,6 +127,7 @@ export const StockEngine = (() => {
 
   const dispatch = (state, {
     transportId,
+    transportNumber = null,   // 👈 added
     fromMmaCode,
     toMmaCode,
     supplierId,
@@ -136,35 +137,36 @@ export const StockEngine = (() => {
     meta = null,
     ts
   }) => {
-
+  
     need(transportId, 'transportId');
     need(fromMmaCode, 'fromMmaCode');
     need(toMmaCode, 'toMmaCode');
     needPos(qty);
     need(ts, 'ts');
-
+  
     const existing = state.transport.find(
       t => t.transportId === transportId
     );
     if (existing) throw new Error('Duplicate transportId');
-
+  
     const available = onHand(state.ledger, {
       mmaCode: fromMmaCode,
       supplierId,
       shade,
       size
     });
-
+  
     if (available < qty) {
       throw new Error('Insufficient stock');
     }
-
+  
     return [
-
-      // Transport event (+)
+  
+      // Transport event
       {
         type: 'DISPATCH',
         transportId,
+        transportNumber,   // 👈 stored here
         fromMmaCode,
         toMmaCode,
         supplierId,
@@ -174,8 +176,8 @@ export const StockEngine = (() => {
         meta,
         ts
       },
-
-      // Ledger event (-)
+  
+      // Ledger event
       {
         type: 'LEDGER',
         mmaCode: fromMmaCode,
@@ -190,7 +192,6 @@ export const StockEngine = (() => {
       }
     ];
   };
-
   // --------------------------------
   // RECEIVE (partial supported)
   // --------------------------------
