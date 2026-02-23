@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= report.meta.title %></title>
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0f172a;
+      padding: 40px;
+      color: #e2e8f0;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 28px;
+      color: #f8fafc;
+    }
+
+    .meta {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .kpis {
+      margin-bottom: 30px;
+    }
+
+    .kpi-box {
+      display: inline-block;
+      background: #1e293b;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      margin-right: 15px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .kpi-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    .supplier-card {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .supplier-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .supplier-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    .supplier-stats {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    thead {
+      background: #111827;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+    }
+
+    th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #334155;
+    }
+
+    tbody tr:hover {
+      background: #273449;
+    }
+
+    td {
+      color: #e2e8f0;
+    }
+
+    td:last-child {
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    .empty-row {
+      text-align: center;
+      color: #64748b;
+      padding: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1><%= report.meta.title %></h1>
+
+  <div class="meta">
+    Generated at: <%= report.meta.generatedAt %>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi-box">
+      <div class="kpi-label">Total Suppliers</div>
+      <div class="kpi-value"><%= report.kpis.totalSuppliers %></div>
+    </div>
+  </div>
+
+  <% if (report.sections.length === 0) { %>
+
+    <div class="supplier-card">
+      <div class="empty-row">No supplier stock data available.</div>
+    </div>
+
+  <% } else { %>
+
+    <% report.sections.forEach(section => { %>
+
+      <div class="supplier-card">
+
+        <div class="supplier-header">
+          <div class="supplier-title">
+            Supplier: <%= section.supplierId %>
+          </div>
+          <div class="supplier-stats">
+            Total Qty: <strong><%= section.totalQty %></strong> |
+            Slots: <strong><%= section.totalSlots %></strong>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>MMA</th>
+              <th>Shade</th>
+              <th>Size</th>
+              <th>Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <% if (section.slots.length === 0) { %>
+              <tr>
+                <td colspan="4" class="empty-row">No active slots</td>
+              </tr>
+            <% } else { %>
+              <% section.slots.forEach(slot => { %>
+                <tr>
+                  <td><%= slot.mmaCode %></td>
+                  <td><%= slot.shade %></td>
+                  <td><%= slot.size %></td>
+                  <td><%= slot.qty %></td>
+                </tr>
+              <% }) %>
+            <% } %>
+
+          </tbody>
+        </table>
+
+      </div>
+
+    <% }) %>
+
+  <% } %>
+
+</body>
+</html>

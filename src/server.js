@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { company } from './application/company.js';
 import * as reportRoutes from './routes/report.js';
 const app = express();
+import reportRouter from './routes/report.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,12 +39,7 @@ app.get('/report', (req, res) => {
 // ==================================================
 // REPORT ROUTES
 // ==================================================
-
-app.get('/report/onhand', reportRoutes.onHand);
-app.get('/report/intransit', reportRoutes.inTransit);
-app.get('/report/transport-audit', reportRoutes.transportAudit);
-app.get('/report/process-audit', reportRoutes.processAudit);
-app.get('/report/movement-ledger', reportRoutes.movementLedger);
+  app.use('/report', reportRouter);
 // ==================================================
 // DEPOSIT
 // ==================================================
