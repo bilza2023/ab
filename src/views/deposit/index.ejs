@@ -8,7 +8,6 @@
       font-family: Arial, sans-serif;
       background: #0f172a;
       color: #e2e8f0;
-
       display: flex;
       justify-content: center;
       align-items: center;
@@ -89,25 +88,28 @@
 
 <div class="container">
   <h1>DEPOSIT</h1>
+
   <div class="context">
     Depositing into: <strong><%= mmaCode %></strong>
   </div>
 
   <form method="POST">
+
+    <!-- Lock MMA -->
     <input type="hidden" name="toMmaCode" value="<%= mmaCode %>" />
 
-    <!-- Supplier Dropdown -->
+    <!-- Supplier -->
     <label>Supplier</label>
     <select name="supplierId" required>
       <option value="">Select Supplier</option>
       <% suppliers.forEach(s => { %>
-        <option value="<%= s.code %>">
+        <option value="<%= s.id %>">
           <%= s.code %> - <%= s.name %>
         </option>
       <% }) %>
     </select>
 
-    <!-- Shade Dropdown -->
+    <!-- Shade -->
     <label>Shade</label>
     <select name="shade" required>
       <% shades.forEach(shade => { %>
@@ -115,7 +117,7 @@
       <% }) %>
     </select>
 
-    <!-- Size Dropdown -->
+    <!-- Size -->
     <label>Size</label>
     <select name="size" required>
       <% sizes.forEach(size => { %>

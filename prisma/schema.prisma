@@ -34,6 +34,8 @@ model StockTransport {
   createdAt    DateTime @default(now())
 
   transportId  String
+  transportNumber String?   // 👈 optional truck number (human reference)
+
   type         String   // enforce in code
 
   fromMmaCode  String?

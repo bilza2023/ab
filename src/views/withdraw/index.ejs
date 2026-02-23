@@ -91,6 +91,7 @@
 
     <label>Supplier</label>
     <select name="supplierId" required>
+      <option value="">Select Supplier</option>
       <% suppliers.forEach(s => { %>
         <option value="<%= s.id %>">
           <%= s.name %> (<%= s.code %>)

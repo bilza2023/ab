@@ -11,7 +11,7 @@ export const eventStore = {
     const ledgerRows = await prisma.stockLedger.findMany();
     const transportRows = await prisma.stockTransport.findMany();
 
-    console.log('EVENTSTORE DB:', process.env.DATABASE_URL);
+    // console.log('EVENTSTORE DB:', process.env.DATABASE_URL);
 
     return {
       ledger: ledgerRows.map(r => ({

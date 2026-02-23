@@ -1,6 +1,7 @@
 import express from 'express';
 import { company } from '../application/company.js';
 import { appData } from '../application/appData.js';
+import { randomUUID } from 'crypto';
 
 const router = express.Router();
 
@@ -65,13 +66,21 @@ router.post('/dispatch', async (req, res) => {
   const {
     fromMmaCode,
     toMmaCode,
-    transportId,
     supplierId,
     shade,
     size,
     qty
   } = req.body;
 
+  // System-generated shipment/grouping key
+  const transportId = randomUUID();
+  // console.log({
+  //   fromMmaCode,
+  //   supplierId,
+  //   shade,
+  //   size,
+  //   qty
+  // });
   await company.dispatch(fromMmaCode, {
     toMmaCode,
     transportId,

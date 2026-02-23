@@ -100,16 +100,12 @@
     <input type="hidden" name="fromMmaCode" value="<%= fromMmaCode %>" />
     <input type="hidden" name="toMmaCode" value="<%= toMmaCode %>" />
 
-    <!-- Transport ID -->
-    <label>Transport ID</label>
-    <input name="transportId" required />
-
-    <!-- Supplier Dropdown -->
+   <!-- Supplier Dropdown -->
     <label>Supplier</label>
     <select name="supplierId" required>
       <option value="">Select Supplier</option>
       <% suppliers.forEach(s => { %>
-        <option value="<%= s.code %>">
+        <option value="<%= s.id %>">
           <%= s.code %> - <%= s.name %>
         </option>
       <% }) %>
