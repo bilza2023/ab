@@ -88,25 +88,20 @@ router.post('/dispatch', async (req, res) => {
 // WITHDRAW
 // ==================================================
 
-router.get('/withdraw', (req, res) => {
+router.get('/withdraw', async (req, res) => {
   const { from } = req.query;
   if (!from) return res.status(400).send('Missing ?from=mmaCode');
 
-  res.render('withdraw/index', { mmaCode: from });
-});
+  const suppliers = await appData.suppliersList();
+  const sizes = appData.sizesList();
+  const shades = appData.shadesList();
 
-router.post('/withdraw', async (req, res) => {
-  const { fromMmaCode, supplierId, shade, size, qty, processId } = req.body;
-
-  await company.withdraw(fromMmaCode, {
-    supplierId,
-    shade,
-    size,
-    qty,
-    processId
+  res.render('withdraw/index', {
+    mmaCode: from,
+    suppliers,
+    sizes,
+    shades
   });
-
-  res.redirect('/');
 });
 
 // ==================================================

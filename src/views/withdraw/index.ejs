@@ -8,21 +8,15 @@
       font-family: Arial, sans-serif;
       background: #0f172a;
       color: #e2e8f0;
-
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
 
-    .container {
-      width: 420px;
-    }
+    .container { width: 420px; }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 5px;
-    }
+    h1 { text-align: center; margin-bottom: 5px; }
 
     .context {
       text-align: center;
@@ -45,7 +39,7 @@
       font-size: 14px;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 8px;
       margin-top: 6px;
@@ -67,9 +61,7 @@
       cursor: pointer;
     }
 
-    button:hover {
-      opacity: 0.9;
-    }
+    button:hover { opacity: 0.9; }
 
     .back {
       display: block;
@@ -80,34 +72,50 @@
       font-size: 14px;
     }
 
-    .back:hover {
-      color: white;
-    }
+    .back:hover { color: white; }
   </style>
 </head>
 <body>
 
 <div class="container">
   <h1>WITHDRAW</h1>
+
   <div class="context">
     Withdrawing from: <strong><%= mmaCode %></strong>
   </div>
 
   <form method="POST">
-    <!-- 🔥 Lock MMA -->
+
+    <!-- LOCK MMA -->
     <input type="hidden" name="fromMmaCode" value="<%= mmaCode %>" />
 
     <label>Process ID</label>
     <input name="processId" required />
 
-    <label>Supplier ID</label>
-    <input name="supplierId" type="number" required />
+    <label>Supplier</label>
+    <select name="supplierId" required>
+      <% suppliers.forEach(s => { %>
+        <option value="<%= s.id %>">
+          <%= s.name %> (<%= s.code %>)
+        </option>
+      <% }) %>
+    </select>
 
     <label>Shade</label>
-    <input name="shade" required />
+    <select name="shade" required>
+      <% shades.forEach(shade => { %>
+        <option value="<%= shade %>"><%= shade %></option>
+      <% }) %>
+    </select>
 
     <label>Size</label>
-    <input name="size" value="ANY" />
+    <select name="size">
+      <% sizes.forEach(size => { %>
+        <option value="<%= size %>" <%= size === 'ANY' ? 'selected' : '' %>>
+          <%= size %>
+        </option>
+      <% }) %>
+    </select>
 
     <label>Quantity</label>
     <input name="qty" type="number" step="0.01" required />
