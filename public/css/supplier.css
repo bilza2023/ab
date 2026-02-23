@@ -1,0 +1,158 @@
+
+/* =========================
+   Page Layout
+========================= */
+
+.page-container {
+    padding: 20px;
+    max-width: 1100px;
+    margin: auto;
+  }
+  
+  .page-header {
+    margin-bottom: 30px;
+  }
+  
+  .page-header h1 {
+    margin: 0;
+    font-size: 22px;
+  }
+  
+  .page-subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+  
+  /* =========================
+     Card
+  ========================= */
+  
+  .card {
+    background: #111827;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 1px solid #1f2937;
+  }
+  
+  /* =========================
+     Form
+  ========================= */
+  
+  .supplier-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #1f2937;
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+  
+  .btn-primary {
+    background: #38bdf8;
+    color: #0b1220;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  .btn-danger {
+    background: #ef4444;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* =========================
+     Supplier List
+  ========================= */
+  
+  .supplier-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .supplier-item {
+    background: #0f172a;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #1f2937;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .supplier-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  
+  .supplier-meta {
+    font-size: 12px;
+    color: #94a3b8;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .supplier-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #64748b;
+  }
+  
+  /* =========================
+     Desktop Enhancements
+  ========================= */
+  
+  @media (min-width: 768px) {
+  
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+  
+    .supplier-item {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    .supplier-meta {
+      flex-direction: row;
+      gap: 20px;
+    }
+  
+  }

@@ -12,37 +12,37 @@ const router = express.Router();
 
 // Index
 router.get('/', (req, res) => {
-  res.render('report/index');
+  res.render('reports/index');
 });
 
 // On Hand
 router.get('/onhand', async (req, res) => {
   const report = await buildOnHandReport();
-  res.render('report/onHand', { report });
+  res.render('reports/onHand', { report });
 });
 
 // In Transit
 router.get('/intransit', async (req, res) => {
   const report = await buildInTransitReport();
-  res.render('report/inTransit', { report });
+  res.render('reports/inTransit', { report });
 });
 
 // MMA
 router.get('/mma', async (req, res) => {
   const report = await buildMmaReport();
-  res.render('report/mma', { report });
+  res.render('reports/mma', { report });
 });
 
 // Supplier
 router.get('/supplier', async (req, res) => {
   const report = await buildSupplierReport();
-  res.render('report/supplier', { report });
+  res.render('reports/supplier', { report });
 });
 
 // Transport Audit
 router.get('/transport-audit', async (req, res) => {
   const report = await buildTransportAuditReport();
-  res.render('report/transportAudit', { report });
+  res.render('reports/transportAudit', { report });
 });
 
 // Process Audit
@@ -51,13 +51,13 @@ router.get('/process-audit', async (req, res) => {
   if (!processId) return res.status(400).send('Missing ?processId=');
 
   const report = await buildProcessAuditReport({ processId });
-  res.render('report/processAudit', { report });
+  res.render('reports/processAudit', { report });
 });
 
 // Movement Ledger
 router.get('/movement-ledger', async (req, res) => {
   const report = await buildMovementLedgerReport(req.query);
-  res.render('report/movementLedger', { report });
+  res.render('reports/movementLedger', { report });
 });
 
 export default router;

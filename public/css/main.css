@@ -1,0 +1,177 @@
+/* =========================
+   Base (Mobile First)
+========================= */
+
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --muted: #94a3b8;
+    --text: #f1f5f9;
+  
+    --green: #16a34a;
+    --red: #dc2626;
+    --blue: #2563eb;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  
+  /* =========================
+     Navbar
+  ========================= */
+  
+/* =========================
+   NAVBAR (Clean + Premium)
+========================= */
+
+.navbar {
+    background: #0b1220;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .nav-inner {
+    max-width: 1100px;
+    margin: auto;
+    padding: 16px 20px;
+  
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .nav-brand {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    color: white;
+  }
+  
+  .nav-right {
+    display: flex;
+    gap: 22px;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+    transition: 0.2s ease;
+    position: relative;
+  }
+  
+  .nav-link:hover {
+    color: white;
+  }
+  
+  /* subtle underline animation */
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background: var(--blue);
+    transition: 0.25s ease;
+  }
+  
+  .nav-link:hover::after {
+    width: 100%;
+  }
+  /* =========================
+     Layout
+  ========================= */
+  
+  .container {
+    padding: 20px;
+  }
+  
+  h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .section {
+    margin-top: 40px;
+  }
+  
+  .section h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+  
+  /* =========================
+     Cards Instead of Tables
+  ========================= */
+  
+  .mma-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 15px;
+  }
+  
+  .mma-name {
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  
+  .action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .button {
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    color: white;
+    transition: 0.2s ease;
+  }
+  
+  .button.green { background: var(--green); }
+  .button.red   { background: var(--red); }
+  .button.blue  { background: var(--blue); }
+  
+  .button:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+  }
+  
+  /* =========================
+     Desktop Enhancements
+  ========================= */
+  
+  @media (min-width: 768px) {
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+  
+    h1 {
+      font-size: 28px;
+    }
+  
+    .mma-card {
+      padding: 20px;
+    }
+  }

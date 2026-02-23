@@ -1,0 +1,97 @@
+
+body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #0b1220;
+    color: #e2e8f0;
+    padding: 50px;
+  }
+  .reports-container {
+    padding: 0px 0px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .header {
+    margin-bottom: 40px;
+  }
+
+  .title {
+    font-size: 34px;
+    font-weight: 600;
+    color: #f8fafc;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: #94a3b8;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+  }
+
+  .card {
+    background: #111827;
+    padding: 28px;
+    border-radius: 18px;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #1f2937;
+    transition: all 0.25s ease;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    border-color: #38bdf8;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, #38bdf8, #6366f1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #38bdf8;
+  }
+
+  .card-desc {
+    font-size: 14px;
+    color: #94a3b8;
+    line-height: 1.6;
+  }
+
+  .section-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
+
+  .footer-note {
+    margin-top: 60px;
+    font-size: 12px;
+    color: #475569;
+    text-align: center;
+  }

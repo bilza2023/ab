@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reports Dashboard</title>
+
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/reports.css" />
+</head>
+
+<body>
+
+  <!-- NAVBAR (always first, no padding wrapper) -->
+  <!-- <div class="reports-container"> -->
+  <%- include('../partials/nav') %>
+
+  <!-- PAGE CONTENT -->
+
+    <div class="header">
+      <div class="title">Reports Dashboard</div>
+      <div class="subtitle">
+        Core operational reports for stock control and transport integrity.
+      </div>
+    </div>
+
+    <div class="section-label">Core Reports</div>
+
+    <div class="grid">
+
+      <a href="/reports/onhand" class="card">
+        <div class="card-title">On-Hand Report</div>
+        <div class="card-desc">
+          Live stock snapshot grouped by MMA, supplier, shade and size.
+        </div>
+      </a>
+
+      <a href="/reports/intransit" class="card">
+        <div class="card-title">In-Transit Report</div>
+        <div class="card-desc">
+          All dispatches currently moving and not fully received.
+        </div>
+      </a>
+
+      <a href="/reports/movement-ledger" class="card">
+        <div class="card-title">Movement Ledger</div>
+        <div class="card-desc">
+          Complete chronological record of all stock movements.
+        </div>
+      </a>
+
+      <a href="/reports/transport-audit" class="card">
+        <div class="card-title">Transport Audit</div>
+        <div class="card-desc">
+          Dispatch vs received comparison. Highlights mismatches and cancelled transports.
+        </div>
+      </a>
+
+      <a href="/reports/mma" class="card">
+        <div class="card-title">MMA Report</div>
+        <div class="card-desc">
+          Warehouse board view — stock organized by MMA location.
+        </div>
+      </a>
+
+      <a href="/reports/supplier" class="card">
+        <div class="card-title">Supplier Report</div>
+        <div class="card-desc">
+          Ownership view — total stock exposure grouped by supplier.
+        </div>
+      </a>
+
+    </div>
+
+    <div class="footer-note">
+      Stock Control System · Core Reporting Suite
+    </div>
+
+  <!-- </div> -->
+
+</body>
+</html>

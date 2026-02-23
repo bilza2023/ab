@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Settings</title>
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+<!-- NAVBAR -->
+
+<%- include('./partials/nav') %>
+
+
+<div class="container">
+
+  <h1>Settings</h1>
+
+  <div class="section">
+
+    <div class="mma-card" style="border-color:#7f1d1d;">
+
+      <div style="margin-bottom:15px; font-weight:600; color:#f87171;">
+        ⚠ Danger Zone
+      </div>
+
+      <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;">
+        This will permanently delete all stock transport and ledger data.
+        This action cannot be undone.
+      </p>
+
+      <a 
+        href="/system/destroy"
+        class="button red"
+        onclick="return confirm('Are you absolutely sure you want to destroy the database?');"
+      >
+        Destroy Database
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

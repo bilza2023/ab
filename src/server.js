@@ -38,10 +38,10 @@ app.get('/', (req, res) => {
 // Routers
 // --------------------------------------------------
 
-app.use('/report', reportRouter);
+app.use('/reports', reportRouter);
 app.use('/suppliers', supplierRouter);
 app.use('/', stockRouter); // deposit, dispatch, withdraw, receive
-
+app.use(express.static('public'));
 // --------------------------------------------------
 // System Utilities (DEV ONLY)
 // --------------------------------------------------
@@ -59,6 +59,9 @@ app.get('/system/destroy', async (req, res) => {
     console.error(err);
     res.status(500).send(err.message);
   }
+});
+app.get('/settings', (req, res) => {
+  res.render('settings');
 });
 
 // --------------------------------------------------
