@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,20 +7,20 @@
   <style>
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: #0f172a;
+      background: #0b1220;
       padding: 40px;
       color: #e2e8f0;
     }
 
     h1 {
-      margin-bottom: 30px;
       font-size: 28px;
+      margin-bottom: 8px;
       color: #f8fafc;
     }
 
     .meta {
+      font-size: 13px;
       color: #94a3b8;
-      font-size: 14px;
       margin-bottom: 30px;
     }
 
@@ -29,10 +30,10 @@
 
     .kpi-box {
       display: inline-block;
-      background: #1e293b;
+      background: #111827;
       padding: 12px 18px;
       border-radius: 10px;
-      border: 1px solid #334155;
+      border: 1px solid #1f2937;
       margin-right: 15px;
     }
 
@@ -48,28 +49,29 @@
     }
 
     .supplier-card {
-      background: #1e293b;
+      background: #111827;
       border-radius: 16px;
-      padding: 25px;
+      padding: 24px;
       margin-bottom: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border: 1px solid #1f2937;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
     }
 
     .supplier-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 16px;
     }
 
     .supplier-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
       color: #38bdf8;
     }
 
-    .supplier-stats {
-      font-size: 13px;
+    .supplier-total {
+      font-size: 14px;
       color: #94a3b8;
     }
 
@@ -81,7 +83,7 @@
     }
 
     thead {
-      background: #111827;
+      background: #0f172a;
     }
 
     th, td {
@@ -98,15 +100,11 @@
     }
 
     tbody tr {
-      border-bottom: 1px solid #334155;
+      border-bottom: 1px solid #1f2937;
     }
 
     tbody tr:hover {
-      background: #273449;
-    }
-
-    td {
-      color: #e2e8f0;
+      background: #1e293b;
     }
 
     td:last-child {
@@ -117,7 +115,7 @@
     .empty-row {
       text-align: center;
       color: #64748b;
-      padding: 15px;
+      padding: 18px;
     }
   </style>
 </head>
@@ -125,7 +123,6 @@
 <body>
 
   <h1><%= report.meta.title %></h1>
-
   <div class="meta">
     Generated at: <%= report.meta.generatedAt %>
   </div>
@@ -137,10 +134,10 @@
     </div>
   </div>
 
-  <% if (report.sections.length === 0) { %>
+  <% if (!report.sections || report.sections.length === 0) { %>
 
     <div class="supplier-card">
-      <div class="empty-row">No supplier stock data available.</div>
+      <div class="empty-row">No supplier deliveries found.</div>
     </div>
 
   <% } else { %>
@@ -153,15 +150,16 @@
           <div class="supplier-title">
             Supplier: <%= section.supplierId %>
           </div>
-          <div class="supplier-stats">
-            Total Qty: <strong><%= section.totalQty %></strong> |
-            Slots: <strong><%= section.totalSlots %></strong>
+          <div class="supplier-total">
+            Total Delivered:
+            <strong><%= section.totalDelivered %></strong>
           </div>
         </div>
 
         <table>
           <thead>
             <tr>
+              <th>Timestamp</th>
               <th>MMA</th>
               <th>Shade</th>
               <th>Size</th>
@@ -170,19 +168,22 @@
           </thead>
           <tbody>
 
-            <% if (section.slots.length === 0) { %>
+            <% if (!section.deliveries || section.deliveries.length === 0) { %>
               <tr>
-                <td colspan="4" class="empty-row">No active slots</td>
+                <td colspan="5" class="empty-row">No deliveries</td>
               </tr>
             <% } else { %>
-              <% section.slots.forEach(slot => { %>
+
+              <% section.deliveries.forEach(delivery => { %>
                 <tr>
-                  <td><%= slot.mmaCode %></td>
-                  <td><%= slot.shade %></td>
-                  <td><%= slot.size %></td>
-                  <td><%= slot.qty %></td>
+                  <td><%= delivery.ts %></td>
+                  <td><%= delivery.mmaCode %></td>
+                  <td><%= delivery.shade %></td>
+                  <td><%= delivery.size %></td>
+                  <td><%= delivery.qty %></td>
                 </tr>
               <% }) %>
+
             <% } %>
 
           </tbody>

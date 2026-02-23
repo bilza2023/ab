@@ -5,30 +5,64 @@ export async function buildInTransitReport() {
 
   const state = await eventStore.getState();
 
-  const transportMap = new Map();
+  const map = new Map();
 
-  // Group transport events by transportId
   for (const t of state.transport) {
 
-    if (!transportMap.has(t.transportId)) {
-      transportMap.set(t.transportId, {
+    if (!map.has(t.transportId)) {
+      map.set(t.transportId, {
         transportId: t.transportId,
         fromMmaCode: t.fromMmaCode,
         toMmaCode: t.toMmaCode,
         supplierId: t.supplierId,
         shade: t.shade,
         size: t.size,
-        qty: 0
+        hasDispatch: false,
+        hasReceive: false,
+        hasCancel: false,
+        dispatchQty: 0
       });
     }
 
-    transportMap.get(t.transportId).qty += t.qtyDelta;
+    const bucket = map.get(t.transportId);
+
+    if (t.type === 'DISPATCH') {
+      bucket.hasDispatch = true;
+      bucket.dispatchQty += Math.abs(t.qtyDelta);
+    }
+
+    if (t.type === 'RECEIVE') {
+      bucket.hasReceive = true;
+    }
+
+    if (t.type === 'CANCEL') {
+      bucket.hasCancel = true;
+    }
   }
 
-  // Keep only pending (> 0)
-  const rows = Array.from(transportMap.values())
-    .filter(r => r.qty > 0)
-    .sort((a, b) => b.qty - a.qty);
+  const rows = [];
+
+  for (const bucket of map.values()) {
+
+    const isPending =
+      bucket.hasDispatch &&
+      !bucket.hasReceive &&
+      !bucket.hasCancel;
+
+    if (isPending) {
+      rows.push({
+        transportId: bucket.transportId,
+        fromMmaCode: bucket.fromMmaCode,
+        toMmaCode: bucket.toMmaCode,
+        supplierId: bucket.supplierId,
+        shade: bucket.shade,
+        size: bucket.size,
+        qty: bucket.dispatchQty
+      });
+    }
+  }
+
+  rows.sort((a, b) => b.qty - a.qty);
 
   const totalPendingQty = rows.reduce((sum, r) => sum + r.qty, 0);
 

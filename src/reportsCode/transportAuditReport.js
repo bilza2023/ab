@@ -14,27 +14,42 @@ export async function buildTransportAuditReport() {
         dispatchQty: 0,
         receiveQty: 0,
         cancelQty: 0,
-        events: []
+        hasReceive: false,
+        hasCancel: false
       });
     }
 
     const bucket = map.get(t.transportId);
-    bucket.events.push(t);
 
-    if (t.type === 'DISPATCH') bucket.dispatchQty += Math.abs(t.qtyDelta);
-    if (t.type === 'RECEIVE') bucket.receiveQty += Math.abs(t.qtyDelta);
-    if (t.type === 'CANCEL') bucket.cancelQty += Math.abs(t.qtyDelta);
+    if (t.type === 'DISPATCH') {
+      bucket.dispatchQty += Math.abs(t.qtyDelta);
+    }
+
+    if (t.type === 'RECEIVE') {
+      bucket.receiveQty += Math.abs(t.qtyDelta);
+      bucket.hasReceive = true;
+    }
+
+    if (t.type === 'CANCEL') {
+      bucket.cancelQty += Math.abs(t.qtyDelta);
+      bucket.hasCancel = true;
+    }
   }
 
   const rows = [];
 
   for (const bucket of map.values()) {
 
+    // 🔥 Only audit completed transports
+    const isCompleted = bucket.hasReceive || bucket.hasCancel;
+    if (!isCompleted) continue;
+
     let status = 'OK';
 
-    if (bucket.cancelQty > 0) {
+    if (bucket.hasCancel) {
       status = 'CANCELLED';
-    } else if (bucket.receiveQty < bucket.dispatchQty) {
+    } 
+    else if (bucket.receiveQty !== bucket.dispatchQty) {
       status = 'MISMATCH';
     }
 

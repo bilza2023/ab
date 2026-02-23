@@ -8,65 +8,59 @@ export async function buildSupplierReport() {
 
   for (const row of state.ledger) {
 
+    // Only count DEPOSIT rows
+    if (row.reason !== 'DEPOSIT') continue;
+    if (row.qtyDelta <= 0) continue;
+
     const supplierId = row.supplierId;
 
     if (!supplierMap.has(supplierId)) {
       supplierMap.set(supplierId, {
         supplierId,
-        slots: new Map()
+        totalDelivered: 0,
+        deliveries: []
       });
     }
 
-    const supplierBucket = supplierMap.get(supplierId);
+    const bucket = supplierMap.get(supplierId);
 
-    const slotKey = [
-      row.mmaCode,
-      row.shade,
-      row.size
-    ].join('|');
+    bucket.totalDelivered += row.qtyDelta;
 
-    if (!supplierBucket.slots.has(slotKey)) {
-      supplierBucket.slots.set(slotKey, {
-        mmaCode: row.mmaCode,
-        shade: row.shade,
-        size: row.size,
-        qty: 0
-      });
-    }
-
-    supplierBucket.slots.get(slotKey).qty += row.qtyDelta;
-  }
-
-  const supplierSections = [];
-
-  for (const supplier of supplierMap.values()) {
-
-    const slots = Array.from(supplier.slots.values())
-      .filter(s => s.qty !== 0)
-      .sort((a, b) => b.qty - a.qty);
-
-    const totalQty = slots.reduce((sum, s) => sum + s.qty, 0);
-
-    supplierSections.push({
-      supplierId: supplier.supplierId,
-      totalQty,
-      totalSlots: slots.length,
-      slots
+    bucket.deliveries.push({
+      ts: row.ts,
+      mmaCode: row.mmaCode,
+      shade: row.shade,
+      size: row.size,
+      qty: row.qtyDelta
     });
   }
 
-  supplierSections.sort((a, b) => b.totalQty - a.totalQty);
+  const sections = [];
+
+  for (const supplier of supplierMap.values()) {
+
+    supplier.deliveries.sort((a, b) => b.ts - a.ts);
+
+    sections.push({
+      supplierId: supplier.supplierId,
+      totalDelivered: supplier.totalDelivered,
+      totalDeliveries: supplier.deliveries.length,
+      deliveries: supplier.deliveries
+    });
+  }
+
+  sections.sort((a, b) => b.totalDelivered - a.totalDelivered);
 
   return {
     meta: {
-      title: "Supplier Report",
+      title: "Supplier Delivery Report",
       generatedAt: new Date().toISOString()
     },
 
     kpis: {
-      totalSuppliers: supplierSections.length
+      totalSuppliers: sections.length
     },
 
-    sections: supplierSections
+    sections
   };
 }

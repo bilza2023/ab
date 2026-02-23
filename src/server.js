@@ -2,9 +2,10 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { company } from './application/company.js';
-import * as reportRoutes from './routes/report.js';
-const app = express();
 import reportRouter from './routes/report.js';
+import { destroyAllData } from './utils/destroy.js';
+
+const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,6 +41,27 @@ app.get('/report', (req, res) => {
 // REPORT ROUTES
 // ==================================================
   app.use('/report', reportRouter);
+// ==================================================
+// SYSTEM DESTROY (DEV ONLY)
+// ==================================================
+
+app.get('/system/destroy', async (req, res) => {
+  try {
+
+    // Safety guard — DO NOT allow in production
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).send('Forbidden in production');
+    }
+
+    await destroyAllData();
+
+    res.send('System wiped clean. (stockTransport + stockLedger cleared)');
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
 // ==================================================
 // DEPOSIT
 // ==================================================
