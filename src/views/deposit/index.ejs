@@ -45,7 +45,7 @@
       font-size: 14px;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 8px;
       margin-top: 6px;
@@ -96,15 +96,34 @@
   <form method="POST">
     <input type="hidden" name="toMmaCode" value="<%= mmaCode %>" />
 
-    <label>Supplier ID</label>
-    <input name="supplierId" type="number" required />
+    <!-- Supplier Dropdown -->
+    <label>Supplier</label>
+    <select name="supplierId" required>
+      <option value="">Select Supplier</option>
+      <% suppliers.forEach(s => { %>
+        <option value="<%= s.code %>">
+          <%= s.code %> - <%= s.name %>
+        </option>
+      <% }) %>
+    </select>
 
+    <!-- Shade Dropdown -->
     <label>Shade</label>
-    <input name="shade" required />
+    <select name="shade" required>
+      <% shades.forEach(shade => { %>
+        <option value="<%= shade %>"><%= shade %></option>
+      <% }) %>
+    </select>
 
+    <!-- Size Dropdown -->
     <label>Size</label>
-    <input name="size" value="ANY" />
+    <select name="size" required>
+      <% sizes.forEach(size => { %>
+        <option value="<%= size %>"><%= size %></option>
+      <% }) %>
+    </select>
 
+    <!-- Quantity -->
     <label>Quantity</label>
     <input name="qty" type="number" step="0.01" required />
 

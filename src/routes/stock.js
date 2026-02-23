@@ -43,14 +43,21 @@ router.post('/deposit', async (req, res) => {
 // DISPATCH
 // ==================================================
 
-router.get('/dispatch', (req, res) => {
+router.get('/dispatch', async (req, res) => {
   const { from, to } = req.query;
   if (!from || !to)
     return res.status(400).send('Missing ?from= & ?to=');
 
+  const suppliers = await appData.suppliersList();
+  const sizes = appData.sizesList();
+  const shades = appData.shadesList();
+
   res.render('dispatch/index', {
     fromMmaCode: from,
-    toMmaCode: to
+    toMmaCode: to,
+    suppliers,
+    sizes,
+    shades
   });
 });
 
