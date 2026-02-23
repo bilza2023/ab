@@ -28,6 +28,7 @@ export const eventStore = {
 
       transport: transportRows.map(r => ({
         transportId: r.transportId,
+        transportNumber: r.transportNumber ?? null,   // 👈 added
         type: r.type,
         fromMmaCode: r.fromMmaCode,
         toMmaCode: r.toMmaCode,
@@ -67,6 +68,7 @@ export const eventStore = {
           await tx.stockTransport.create({
             data: {
               transportId: e.transportId,
+              transportNumber: e.transportNumber ?? null,  // 👈 added
               type: e.type,
               fromMmaCode: e.fromMmaCode ?? null,
               toMmaCode: e.toMmaCode ?? null,
