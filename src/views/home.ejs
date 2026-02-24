@@ -12,68 +12,48 @@
 
   <h1>Control Panel</h1>
 
-  <!-- ABS -->
-  <div class="section">
-    <h2>Station: ABS</h2>
+  <% 
+    const stations = {};
+    mmas.forEach(code => {
+      const station = code.split('_')[0];
+      if (!stations[station]) stations[station] = [];
+      stations[station].push(code);
+    });
+  %>
 
-    <div class="mma-card">
-      <div class="mma-name">ABS_RAW</div>
-      <div class="action-row">
-        <a class="button green" href="/deposit?to=ABS_RAW">Deposit</a>
-        <a class="button red" href="/withdraw?from=ABS_RAW">Withdraw</a>
-        <a class="button blue" href="/dispatch?from=ABS_RAW&to=PSS_SCREENED">→ PSS_SCREENED</a>
-      </div>
+  <% Object.keys(stations).forEach(station => { %>
+    
+    <div class="section">
+      <h2>Station: <%= station %></h2>
+
+      <% stations[station].forEach(mma => { %>
+        <div class="mma-card">
+          <div class="mma-name"><%= mma %></div>
+          <div class="action-row">
+
+            <a class="button green" href="/deposit?to=<%= mma %>">Deposit</a>
+            <a class="button red" href="/withdraw?from=<%= mma %>">Withdraw</a>
+
+            <% if (lanes[mma]) { %>
+              <% lanes[mma].forEach(target => { %>
+                <a class="button blue" 
+                   href="/dispatch?from=<%= mma %>&to=<%= target %>">
+                   → <%= target %>
+                </a>
+              <% }) %>
+            <% } %>
+
+            <a class="button blue" href="/receive?to=<%= mma %>">
+              ← Receive
+            </a>
+
+          </div>
+        </div>
+      <% }) %>
+
     </div>
 
-    <div class="mma-card">
-      <div class="mma-name">ABS_SCREENED</div>
-      <div class="action-row">
-        <a class="button green" href="/deposit?to=ABS_SCREENED">Deposit</a>
-        <a class="button red" href="/withdraw?from=ABS_SCREENED">Withdraw</a>
-        <a class="button blue" href="/dispatch?from=ABS_SCREENED&to=PSS_SCREENED">→ PSS_SCREENED</a>
-        <a class="button blue" href="/receive?to=ABS_SCREENED">← ABS_RAW</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- PSS -->
-  <div class="section">
-    <h2>Station: PSS</h2>
-
-    <div class="mma-card">
-      <div class="mma-name">PSS_SCREENED</div>
-      <div class="action-row">
-        <a class="button green" href="/deposit?to=PSS_SCREENED">Deposit</a>
-        <a class="button red" href="/withdraw?from=PSS_SCREENED">Withdraw</a>
-        <a class="button blue" href="/dispatch?from=PSS_SCREENED&to=PSS_SORTED">→ PSS_SORTED</a>
-        <a class="button blue" href="/receive?to=PSS_SCREENED">← ABS_SCREENED</a>
-      </div>
-    </div>
-
-    <div class="mma-card">
-      <div class="mma-name">PSS_SORTED</div>
-      <div class="action-row">
-        <a class="button green" href="/deposit?to=PSS_SORTED">Deposit</a>
-        <a class="button red" href="/withdraw?from=PSS_SORTED">Withdraw</a>
-        <a class="button blue" href="/dispatch?from=PSS_SORTED&to=KEF_SORTED">→ KEF_SORTED</a>
-        <a class="button blue" href="/receive?to=PSS_SORTED">← PSS_SCREENED</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- KEF -->
-  <div class="section">
-    <h2>Station: KEF</h2>
-
-    <div class="mma-card">
-      <div class="mma-name">KEF_SORTED</div>
-      <div class="action-row">
-        <a class="button green" href="/deposit?to=KEF_SORTED">Deposit</a>
-        <a class="button red" href="/withdraw?from=KEF_SORTED">Withdraw</a>
-        <a class="button blue" href="/receive?to=KEF_SORTED">← PSS_SORTED</a>
-      </div>
-    </div>
-  </div>
+  <% }) %>
 
 </div>
 

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import reportRouter from './routes/report.js';
 import supplierRouter from './routes/supplier.js';
 import stockRouter from './routes/stock.js';
+import {appData} from './application/appData.js';
 
 import { destroyAllData } from './utils/destroy.js';
 
@@ -29,11 +30,12 @@ app.set('views', path.join(__dirname, 'views'));
 // --------------------------------------------------
 // Home
 // --------------------------------------------------
-
 app.get('/', (req, res) => {
-  res.render('home');
-});
+  const mmas = appData.mmaList();
+  const lanes = appData.getLanes();
 
+  res.render('home', { mmas, lanes });
+});
 // --------------------------------------------------
 // Routers
 // --------------------------------------------------

@@ -1,6 +1,4 @@
 
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
 
 export const appData = {
 
@@ -17,7 +15,37 @@ export const appData = {
   },
 
   mmaList() {
-    return ['ABS_RAW', 'PSS_RAW', 'KEF'];
+    return [
+      'ABS_RAW',
+      'ABS_SORTED',
+      'ABS_SCREENED',
+
+      'PSS_RAW',
+      'PSS_SORTED',
+      'PSS_SCREENED',
+      
+      'KEF_RAW',
+      'KEF_SORTED',
+      'KEF_SCREENED'
+    ];
+  },
+
+  getLanes() {
+    const families = {
+      RAW: ['ABS_RAW','PSS_RAW','KEF_RAW'],
+      SORTED: ['ABS_SORTED','PSS_SORTED','KEF_SORTED'],
+      SCREENED: ['ABS_SCREENED','PSS_SCREENED','KEF_SCREENED']
+    };
+
+    const lanes = {};
+
+    Object.values(families).forEach(group => {
+      group.forEach(from => {
+        lanes[from] = group.filter(to => to !== from);
+      });
+    });
+
+    return lanes;
   }
 
 };
