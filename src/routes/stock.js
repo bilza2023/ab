@@ -126,7 +126,12 @@ router.post('/withdraw', async (req, res) => {
 // ==================================================
 
 router.get('/receive', (req, res) => {
-  res.render('receive/index');
+  const { to, transportId } = req.query;
+
+  res.render('receive/index', {
+    to: to || '',
+    transportId: transportId || ''
+  });
 });
 
 router.post('/receive', async (req, res) => {

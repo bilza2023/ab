@@ -95,9 +95,24 @@
       color: #e2e8f0;
     }
 
-    td:last-child {
+    .action-cell a {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      text-decoration: none;
       font-weight: 600;
-      color: #facc15;
+      margin-right: 8px;
+    }
+
+    .btn-receive {
+      background: #16a34a;
+      color: white;
+    }
+
+    .btn-cancel {
+      background: #dc2626;
+      color: white;
     }
 
     .empty-row {
@@ -136,13 +151,14 @@
           <% report.table.columns.forEach(col => { %>
             <th><%= col.label %></th>
           <% }) %>
+          <th>Actions</th>
         </tr>
       </thead>
 
       <tbody>
         <% if (report.table.rows.length === 0) { %>
           <tr>
-            <td colspan="<%= report.table.columns.length %>" class="empty-row">
+            <td colspan="<%= report.table.columns.length + 1 %>" class="empty-row">
               No pending transports.
             </td>
           </tr>
@@ -152,6 +168,19 @@
               <% report.table.columns.forEach(col => { %>
                 <td><%= row[col.key] %></td>
               <% }) %>
+
+              <td class="action-cell">
+                <a class="btn-receive"
+                   href="/receive?to=<%= row.toMmaCode %>&transportId=<%= row.transportId %>">
+                   Receive
+                </a>
+
+                <a class="btn-cancel"
+                   href="/cancel?transportId=<%= row.transportId %>">
+                   Cancel
+                </a>
+              </td>
+
             </tr>
           <% }) %>
         <% } %>
