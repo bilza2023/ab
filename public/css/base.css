@@ -1,0 +1,50 @@
+/* =========================
+   Base (Foundation Only)
+========================= */
+
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --muted: #94a3b8;
+    --text: #f1f5f9;
+  
+    --green: #16a34a;
+    --red: #dc2626;
+    --blue: #2563eb;
+  
+    --radius: 8px;
+    --transition: 0.2s ease;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  
+  h1, h2, h3 {
+    margin: 0 0 16px 0;
+    font-weight: 600;
+  }
+  
+  a {
+    color: inherit;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+  
+  @media (min-width: 768px) {
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+  }

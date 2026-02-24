@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 // --------------------------------------------------
 
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static('public'));
 // --------------------------------------------------
 // View Engine
 // --------------------------------------------------
@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
 app.use('/reports', reportRouter);
 app.use('/suppliers', supplierRouter);
 app.use('/', stockRouter); // deposit, dispatch, withdraw, receive
-app.use(express.static('public'));
+
 // --------------------------------------------------
 // System Utilities (DEV ONLY)
 // --------------------------------------------------
@@ -66,6 +66,24 @@ app.get('/settings', (req, res) => {
   res.render('settings');
 });
 
+// --------------------------------------------------
+// 404 handler (no route matched)
+app.use((req, res) => {
+  res.status(404).render('error', {
+    message: 'Page not found.'
+  });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(500).render('error', {
+    message: process.env.NODE_ENV === 'production'
+      ? 'Internal server error.'
+      : err.message
+  });
+});
 // --------------------------------------------------
 // Start Server
 // --------------------------------------------------

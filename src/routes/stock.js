@@ -133,8 +133,7 @@ router.get('/receive', (req, res) => {
     transportId: transportId || ''
   });
 });
-
-router.post('/receive', async (req, res) => {
+router.post('/receive', async (req, res, next) => {
   try {
     const { transportId, qty } = req.body;
 
@@ -145,9 +144,9 @@ router.post('/receive', async (req, res) => {
 
     res.redirect('/');
   } catch (err) {
-    console.error(err);
-    res.status(400).send(err.message);
+    next(err);   // 👈 this sends to global error handler
   }
 });
+
 
 export default router;

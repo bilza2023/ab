@@ -1,201 +1,95 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <title><%= report.meta.title %></title>
-
-  <style>
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: #0b1220;
-      padding: 40px;
-      color: #e2e8f0;
-    }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 8px;
-      color: #f8fafc;
-    }
-
-    .meta {
-      font-size: 13px;
-      color: #94a3b8;
-      margin-bottom: 30px;
-    }
-
-    .kpis {
-      margin-bottom: 30px;
-    }
-
-    .kpi-box {
-      display: inline-block;
-      background: #111827;
-      padding: 12px 18px;
-      border-radius: 10px;
-      border: 1px solid #1f2937;
-      margin-right: 15px;
-    }
-
-    .kpi-label {
-      font-size: 12px;
-      color: #94a3b8;
-    }
-
-    .kpi-value {
-      font-size: 18px;
-      font-weight: 600;
-      color: #38bdf8;
-    }
-
-    .supplier-card {
-      background: #111827;
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 30px;
-      border: 1px solid #1f2937;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-    }
-
-    .supplier-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .supplier-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #38bdf8;
-    }
-
-    .supplier-total {
-      font-size: 14px;
-      color: #94a3b8;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    thead {
-      background: #0f172a;
-    }
-
-    th, td {
-      padding: 12px 14px;
-      text-align: left;
-    }
-
-    th {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #94a3b8;
-      font-weight: 500;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid #1f2937;
-    }
-
-    tbody tr:hover {
-      background: #1e293b;
-    }
-
-    td:last-child {
-      font-weight: 600;
-      color: #facc15;
-    }
-
-    .empty-row {
-      text-align: center;
-      color: #64748b;
-      padding: 18px;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/reports.css" />
 </head>
 
 <body>
 
+  <%- include('../partials/nav') %>
 
+  <div class="report-container">
 
-  <h1><%= report.meta.title %></h1>
-  <div class="meta">
-    Generated at: <%= report.meta.generatedAt %>
-  </div>
-
-  <div class="kpis">
-    <div class="kpi-box">
-      <div class="kpi-label">Total Suppliers</div>
-      <div class="kpi-value"><%= report.kpis.totalSuppliers %></div>
-    </div>
-  </div>
-
-  <% if (!report.sections || report.sections.length === 0) { %>
-
-    <div class="supplier-card">
-      <div class="empty-row">No supplier deliveries found.</div>
+    <div class="report-title">
+      <%= report.meta.title %>
     </div>
 
-  <% } else { %>
+    <div class="report-meta">
+      Generated at: <%= report.meta.generatedAt %>
+    </div>
 
-    <% report.sections.forEach(section => { %>
+    <div class="kpis">
+      <div class="kpi-box">
+        <div class="kpi-label">Total Suppliers</div>
+        <div class="kpi-value"><%= report.kpis.totalSuppliers %></div>
+      </div>
+    </div>
 
-      <div class="supplier-card">
+    <% if (!report.sections || report.sections.length === 0) { %>
 
-        <div class="supplier-header">
-          <div class="supplier-title">
-            Supplier: <%= section.supplierId %>
-          </div>
-          <div class="supplier-total">
-            Total Delivered:
-            <strong><%= section.totalDelivered %></strong>
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>MMA</th>
-              <th>Shade</th>
-              <th>Size</th>
-              <th>Qty</th>
-            </tr>
-          </thead>
-          <tbody>
-
-            <% if (!section.deliveries || section.deliveries.length === 0) { %>
-              <tr>
-                <td colspan="5" class="empty-row">No deliveries</td>
-              </tr>
-            <% } else { %>
-
-              <% section.deliveries.forEach(delivery => { %>
-                <tr>
-                  <td><%= delivery.ts %></td>
-                  <td><%= delivery.mmaCode %></td>
-                  <td><%= delivery.shade %></td>
-                  <td><%= delivery.size %></td>
-                  <td><%= delivery.qty %></td>
-                </tr>
-              <% }) %>
-
-            <% } %>
-
-          </tbody>
-        </table>
-
+      <div class="report-card">
+        <div class="empty-row">No supplier deliveries found.</div>
       </div>
 
-    <% }) %>
+    <% } else { %>
 
-  <% } %>
+      <% report.sections.forEach(section => { %>
+
+        <div class="report-card">
+
+          <div class="mma-header">
+            <div class="mma-title">
+              Supplier: <%= section.supplierId %>
+            </div>
+            <div class="mma-stats">
+              Total Delivered:
+              <strong><%= section.totalDelivered %></strong>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>MMA</th>
+                <th>Shade</th>
+                <th>Size</th>
+                <th class="text-right">Qty</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <% if (!section.deliveries || section.deliveries.length === 0) { %>
+                <tr>
+                  <td colspan="5" class="empty-row">No deliveries</td>
+                </tr>
+              <% } else { %>
+
+                <% section.deliveries.forEach(delivery => { %>
+                  <tr>
+                    <td><%= delivery.ts %></td>
+                    <td><%= delivery.mmaCode %></td>
+                    <td><%= delivery.shade %></td>
+                    <td><%= delivery.size %></td>
+                    <td class="text-right text-warning"><%= delivery.qty %></td>
+                  </tr>
+                <% }) %>
+
+              <% } %>
+
+            </tbody>
+          </table>
+
+        </div>
+
+      <% }) %>
+
+    <% } %>
+
+  </div>
 
 </body>
 </html>

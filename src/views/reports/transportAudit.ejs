@@ -2,204 +2,88 @@
 <html>
 <head>
   <title><%= report.meta.title %></title>
-
-  <style>
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: #0f172a;
-      padding: 40px;
-      color: #e2e8f0;
-    }
-
-    .report-card {
-      background: #1e293b;
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      max-width: 1100px;
-      margin: auto;
-    }
-
-    h1 {
-      margin: 0 0 10px 0;
-      font-size: 28px;
-      font-weight: 600;
-      color: #f8fafc;
-    }
-
-    .meta {
-      color: #94a3b8;
-      font-size: 14px;
-      margin-bottom: 25px;
-    }
-
-    .kpis {
-      display: flex;
-      gap: 40px;
-      margin-bottom: 30px;
-    }
-
-    .kpi-box {
-      background: #0f172a;
-      padding: 15px 20px;
-      border-radius: 12px;
-      border: 1px solid #334155;
-      min-width: 180px;
-    }
-
-    .kpi-label {
-      font-size: 13px;
-      color: #94a3b8;
-    }
-
-    .kpi-value {
-      font-size: 24px;
-      font-weight: 600;
-      margin-top: 6px;
-      color: #38bdf8;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      border-radius: 14px;
-      overflow: hidden;
-    }
-
-    thead {
-      background: #111827;
-    }
-
-    th, td {
-      padding: 14px 16px;
-      text-align: left;
-    }
-
-    th {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #94a3b8;
-      font-weight: 500;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid #334155;
-    }
-
-    tbody tr:hover {
-      background: #273449;
-    }
-
-    td {
-      color: #e2e8f0;
-    }
-
-    td:nth-child(5) {
-      font-weight: 600;
-      color: #facc15;
-    }
-
-    .row-mismatch {
-      background: #7f1d1d;
-    }
-
-    .row-cancelled {
-      background: #1e3a8a;
-    }
-
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .status-OK {
-      background: #14532d;
-      color: #86efac;
-    }
-
-    .status-MISMATCH {
-      background: #7f1d1d;
-      color: #fca5a5;
-    }
-
-    .status-CANCELLED {
-      background: #1e3a8a;
-      color: #93c5fd;
-    }
-
-    .empty-row {
-      text-align: center;
-      color: #64748b;
-      padding: 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/reports.css" />
 </head>
 
 <body>
 
-  <div class="report-card">
+  <%- include('../partials/nav') %>
 
-    <h1><%= report.meta.title %></h1>
+  <div class="report-container">
 
-    <div class="meta">
-      Generated at: <%= report.meta.generatedAt %>
-    </div>
+    <div class="report-card">
 
-    <div class="kpis">
-      <div class="kpi-box">
-        <div class="kpi-label">Total Transports</div>
-        <div class="kpi-value"><%= report.kpis.totalTransports %></div>
+      <div class="report-title">
+        <%= report.meta.title %>
       </div>
 
-      <div class="kpi-box">
-        <div class="kpi-label">Mismatches</div>
-        <div class="kpi-value"><%= report.kpis.mismatches %></div>
+      <div class="report-meta">
+        Generated at: <%= report.meta.generatedAt %>
       </div>
-    </div>
 
-    <table>
-      <thead>
-        <tr>
-          <% report.table.columns.forEach(col => { %>
-            <th><%= col.label %></th>
-          <% }) %>
-        </tr>
-      </thead>
+      <div class="kpis">
+        <div class="kpi-box">
+          <div class="kpi-label">Total Transports</div>
+          <div class="kpi-value"><%= report.kpis.totalTransports %></div>
+        </div>
 
-      <tbody>
-        <% if (report.table.rows.length === 0) { %>
+        <div class="kpi-box">
+          <div class="kpi-label">Mismatches</div>
+          <div class="kpi-value"><%= report.kpis.mismatches %></div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
           <tr>
-            <td colspan="<%= report.table.columns.length %>" class="empty-row">
-              No transport records found.
-            </td>
+            <% report.table.columns.forEach(col => { %>
+              <th><%= col.label %></th>
+            <% }) %>
           </tr>
-        <% } else { %>
-          <% report.table.rows.forEach(row => { %>
+        </thead>
 
-            <tr class="
-              <%= row.status === 'MISMATCH' ? 'row-mismatch' : '' %>
-              <%= row.status === 'CANCELLED' ? 'row-cancelled' : '' %>
-            ">
-              <% report.table.columns.forEach(col => { %>
-                <% if (col.key === 'status') { %>
-                  <td>
-                    <span class="status-badge status-<%= row.status %>">
-                      <%= row.status %>
-                    </span>
-                  </td>
-                <% } else { %>
-                  <td><%= row[col.key] %></td>
-                <% } %>
-              <% }) %>
+        <tbody>
+          <% if (report.table.rows.length === 0) { %>
+            <tr>
+              <td colspan="<%= report.table.columns.length %>" class="empty-row">
+                No transport records found.
+              </td>
             </tr>
+          <% } else { %>
 
-          <% }) %>
-        <% } %>
-      </tbody>
-    </table>
+            <% report.table.rows.forEach(row => { %>
+
+              <tr class="
+                <%= row.status === 'MISMATCH' ? 'row-mismatch' : '' %>
+                <%= row.status === 'CANCELLED' ? 'row-cancelled' : '' %>
+              ">
+
+                <% report.table.columns.forEach((col, idx) => { %>
+
+                  <% if (col.key === 'status') { %>
+                    <td>
+                      <span class="status-badge status-<%= row.status %>">
+                        <%= row.status %>
+                      </span>
+                    </td>
+                  <% } else { %>
+                    <td class="<%= idx === 4 ? 'text-warning text-right' : '' %>">
+                      <%= row[col.key] %>
+                    </td>
+                  <% } %>
+
+                <% }) %>
+
+              </tr>
+
+            <% }) %>
+
+          <% } %>
+        </tbody>
+      </table>
+
+    </div>
 
   </div>
 
