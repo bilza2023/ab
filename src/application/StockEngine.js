@@ -208,6 +208,19 @@ export const StockEngine = (() => {
 
     if (!dispatchEvent) throw new Error('DISPATCH not found');
 
+    //////////////
+    const related = state.transport.filter(
+      t => t.transportId === transportId
+    );
+    
+    const closed = related.some(
+      t => t.type === 'RECEIVE' || t.type === 'CANCEL'
+    );
+    
+    if (closed) {
+      throw new Error('Transport already closed');
+    }
+    //////////////
     const balance = transportBalance(state.transport, transportId);
 
     if (qty > balance) {
@@ -252,16 +265,36 @@ export const StockEngine = (() => {
 
     need(transportId, 'transportId');
     need(ts, 'ts');
-
-    const balance = transportBalance(state.transport, transportId);
-    if (balance <= 0) return [];
-
-    const dispatchEvent = state.transport.find(
-      t => t.transportId === transportId && t.type === 'DISPATCH'
+  
+    const related = state.transport.filter(
+      t => t.transportId === transportId
     );
-
+  
+    if (related.length === 0) {
+      throw new Error('DISPATCH not found');
+    }
+  
+    const dispatchEvent = related.find(t => t.type === 'DISPATCH');
+    if (!dispatchEvent) {
+      throw new Error('DISPATCH not found');
+    }
+  
+    const alreadyClosed = related.some(
+      t => t.type === 'RECEIVE' || t.type === 'CANCEL'
+    );
+  
+    if (alreadyClosed) {
+      throw new Error('Transport already closed');
+    }
+  
+    const balance = transportBalance(state.transport, transportId);
+  
+    if (balance <= 0) {
+      throw new Error('Nothing to cancel');
+    }
+  
     return [
-
+  
       {
         type: 'CANCEL',
         transportId,
@@ -273,7 +306,7 @@ export const StockEngine = (() => {
         qtyDelta: -balance,
         ts
       },
-
+  
       {
         type: 'LEDGER',
         mmaCode: dispatchEvent.fromMmaCode,
@@ -287,9 +320,7 @@ export const StockEngine = (() => {
       }
     ];
   };
-
   return {
-    onHand,
     deposit,
     withdraw,
     dispatch,
